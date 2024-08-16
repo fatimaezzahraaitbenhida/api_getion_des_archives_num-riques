@@ -1,0 +1,333 @@
+.main-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    gap: 20px;
+}
+.departement-list .list-item.department-item {
+    background-color: white; /* Couleur de fond en rouge */
+    color: black; /* Couleur du texte en blanc */
+    padding: 5px; /* Espacement intérieur */
+    border-radius: 3px; /* Coins arrondis */
+    margin: 2px 0; /* Espacement extérieur */
+}
+.utilisateur-item .list-item.utilisateur-item{
+    padding: 5px;
+    background-color: #562222; /* Couleur de fond pour les utilisateurs */
+    border: 1px solid #ddd;
+    margin: 2px 0;
+    border-radius: 4px;
+}
+
+.list-button {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.toggle-button {
+    margin-right: 5px;
+}
+
+
+.service-list .list-item.service-item {
+    background-color: white; /* Couleur de fond en vert */
+    color: black; /* Couleur du texte en blanc */
+    padding: 5px; /* Espacement intérieur */
+    border-radius: 3px; /* Coins arrondis */
+    margin: 2px 0; /* Espacement extérieur */
+}
+
+.service-list {
+    padding-left: 20px;
+}
+
+.service-list .list-item {
+    display: flex;
+    align-items: center;
+}
+
+.service-list .list-button span {
+    margin-left: 5px;
+    font-style: italic;
+}
+
+/* Styles pour les boutons */
+.btn-validate, .btn-cancel {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    margin: 5px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.btn-validate {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-validate:hover {
+    background-color: #218838;
+}
+
+.btn-cancel {
+    background-color: #dc3545;
+    color: white;
+}
+.btn-cancel:hover {
+    background-color: #c82333;
+}
+/* Assurez-vous que ces règles CSS ne sont pas écrasées */
+.fetch-button {
+    margin: 10px 0;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block; /* Assure que les boutons s'affichent en ligne */
+}
+
+.fetch-button:hover {
+    background-color: #0056b3;
+}
+
+
+.tree-view {
+    flex: 2;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.tree-view-content {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.list-item {
+    padding: 5px 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.list-button {
+    margin-left: 10px;
+    color: #333;
+}
+
+.toggle-button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-size: 16px;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.plus {
+    font-weight: bold;
+}
+
+.minus {
+    font-weight: bold;
+}
+
+.demandeurs-container {
+    flex: 1;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.titre-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.action-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.demandes-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.demandes-table th, .demandes-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.demandes-table th {
+    background-color: #f4f4f4;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: row;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.tree-view {
+    flex: 2;
+    padding: 10px;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+}
+
+.demandeurs-container {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.toggle-button {
+    margin-right: 5px;
+}
+
+
+
+.list-button {
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Styles pour les tableaux */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+/* Styles pour le conteneur du titre */
+.titre-container {
+    text-align: center;
+    position: relative;
+    margin-bottom: 20px; /* Ajoute un espace sous le conteneur */
+}
+
+.titre-container::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 2px; /* Définir l'épaisseur de la ligne */
+    background-color: #333; /* Définir la couleur de la ligne */
+    margin-bottom: 10px; /* Ajoute un espace sous la ligne */
+}
+
+th {
+    background-color: #f4f4f4;
+}
+.demandeurs-container h2 {
+    text-align: center; /* Centre le texte du titre */
+    font-size: 24px; /* Ajuste la taille de la police si nécessaire */
+    color: #333; /* Assure que la couleur du texte est visible */
+    margin-bottom: 20px; /* Ajoute un espace en bas du titre */
+}
+
+.demandeurs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+
+.demandeurs-table th, .demandeurs-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.demandeurs-table th {
+    background-color: #f4f4f4;
+}
+
+.fetch-button {
+    margin: 10px 0;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.fetch-button:hover {
+    background-color: #0056b3;
+}
+/* Styles pour le tableau des demandeurs */
+.demandeurs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+
+.demandeurs-table th, .demandeurs-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.demandeurs-table th {
+    background-color: #f4f4f4;
+    color: #333;
+    text-align: left;
+}
+
+
+.fetch-button {
+    margin: 10px 0;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.fetch-button:hover {
+    background-color: #0056b3;
+}
+.document-item a {
+    text-decoration: none;
+    color: #007bff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+}
+
+.document-item a:hover {
+    background-color: #007bff;
+    color: white;
+}
