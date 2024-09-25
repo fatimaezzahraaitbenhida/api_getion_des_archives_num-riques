@@ -60,9 +60,12 @@ public class ServiceIMPL implements ServiceService {
         Optional<ServiceEntity> serviceOptional = serviceRepository.findById(id);
         if (serviceOptional.isPresent()) {
             ServiceEntity service = serviceOptional.get();
-            if (serviceRepository.existsByNomService(serviceDTO.getNomService())) {
+
+            // Check if another service with the same name exists, excluding the current service
+            if (serviceRepository.existsByNomServiceAndIdNot(serviceDTO.getNomService(), id)) {
                 throw new IllegalArgumentException("Le nom du service doit être unique.");
             }
+
             service.setNomService(serviceDTO.getNomService());
 
             // Update the department
@@ -75,6 +78,8 @@ public class ServiceIMPL implements ServiceService {
             throw new RuntimeException("Service non trouvé avec l'ID : " + id);
         }
     }
+
+
 
 
     @Override

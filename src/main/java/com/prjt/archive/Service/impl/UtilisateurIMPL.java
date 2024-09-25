@@ -167,19 +167,29 @@ public class UtilisateurIMPL implements UtilisateurService {
         return convertToDTO(utilisateur);
     }
 
-    private UtilisateurDTO convertToDTO(Utilisateur utilisateur) {
-        if (utilisateur == null) return null;
 
-        UtilisateurDTO dto = new UtilisateurDTO();
-        dto.setId(utilisateur.getId());
-        dto.setGmail(utilisateur.getEmail());
-        dto.setPrenom(utilisateur.getPrenom());
-        dto.setPassword(utilisateur.getPassword()); // Exposez ce champ avec précaution
-        dto.setTypeUser(utilisateur.getTypeUser());
-        dto.setSiteId(utilisateur.getSite() != null ? utilisateur.getSite().getId() : null);
-        dto.setServiceId(utilisateur.getService() != null ? utilisateur.getService().getId_service() : null);
 
-        return dto;
+    @Override
+    public UtilisateurDTO convertToDTO(Utilisateur utilisateur) {
+        UtilisateurDTO utilisateurDTO = new UtilisateurDTO();
+        utilisateurDTO.setId(utilisateur.getId());
+        utilisateurDTO.setGmail(utilisateur.getEmail());
+        utilisateurDTO.setPrenom(utilisateur.getPrenom());
+        utilisateurDTO.setPassword(utilisateur.getPassword());
+        utilisateurDTO.setTypeUser(utilisateur.getTypeUser());
+
+        // Récupération des IDs de site et service associés, s'ils existent
+        Site site = utilisateur.getSite();
+        if (site != null) {
+            utilisateurDTO.setSiteId(site.getId());
+        }
+
+        com.prjt.archive.Entity.ServiceEntity service = utilisateur.getService();
+        if (service != null) {
+            utilisateurDTO.setServiceId(service.getId_service());
+        }
+
+        return utilisateurDTO;
     }
 
 }

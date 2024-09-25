@@ -7,6 +7,7 @@ import com.prjt.archive.Entity.Departement;
 import com.prjt.archive.Entity.Site;
 
 import java.util.List;
+import java.util.Set;
 
 public interface SiteService {
     Site addSite(Site site);
@@ -17,4 +18,8 @@ public interface SiteService {
     List<Site> getSitesByServiceId(Long serviceId);
     SiteDTO convertToDTO(Site site);
     String getSocieteNameBySiteId(Long siteId);
+
+    Set<Site> getSitesByIds(Set<Long> siteIds);
+
+    void addDepartementToSite(Long siteId, Long departementId);
 }

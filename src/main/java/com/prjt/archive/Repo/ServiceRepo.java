@@ -12,4 +12,7 @@ public interface ServiceRepo extends JpaRepository<ServiceEntity, Long> {
     boolean existsByNomService(String nomService);
     @Query("SELECT s FROM ServiceEntity s WHERE s.departement.id_dep = :departementId")
     List<ServiceEntity> findByDepartementId(@Param("departementId") Long departementId);
+    @Query("SELECT CASE WHEN COUNT(s) > 0 THEN TRUE ELSE FALSE END FROM ServiceEntity s WHERE s.nomService = :nomService AND s.id_service != :id")
+    boolean existsByNomServiceAndIdNot(@Param("nomService") String nomService, @Param("id") Long id);
+
 }

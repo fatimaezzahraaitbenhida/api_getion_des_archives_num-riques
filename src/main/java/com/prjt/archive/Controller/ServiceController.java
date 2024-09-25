@@ -46,6 +46,7 @@ public class ServiceController {
     }
 
 
+
     @GetMapping("/all")
     public ResponseEntity<List<ServiceEntity>> getAllServices() {
         System.out.println("Récupération de tous les services");
@@ -64,6 +65,7 @@ public class ServiceController {
         ServiceEntity updatedService = serviceService.updateService(id, serviceDTO);
         return ResponseEntity.ok(updatedService);
     }
+
 
 
     @DeleteMapping("/delete/{id}")

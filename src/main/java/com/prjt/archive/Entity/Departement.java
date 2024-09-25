@@ -56,5 +56,9 @@ public class Departement {
         this.sites = sites;
     }
 
+    public void addSite(Site site) {
+        this.sites.add(site);
+        site.getDepartements().add(this);
+    }
 
 }

@@ -6,8 +6,10 @@ import com.prjt.archive.Entity.Departement;
 import com.prjt.archive.Entity.Site;
 import com.prjt.archive.Entity.ServiceEntity;
 
+import com.prjt.archive.Repo.DepartementRepo;
 import com.prjt.archive.Repo.SiteRepo;
 import com.prjt.archive.Service.SiteService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +17,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class SiteIMPL implements SiteService {
     @Autowired
     private SiteRepo siteRepository;
+    @Autowired
+    private DepartementRepo departementRepository;
 
 
     @Override
@@ -80,6 +85,12 @@ public class SiteIMPL implements SiteService {
         }
         return "Non spécifié"; // Handle cases where site or societe is not found
     }
+
+    @Override
+    public Set<Site> getSitesByIds(Set<Long> siteIds) {
+        return siteRepository.findAllById(siteIds).stream().collect(Collectors.toSet());
+    }
+
     @Override
     public void deleteSite(Long id) {
         Site site = getSiteById(id);
@@ -102,7 +113,16 @@ public class SiteIMPL implements SiteService {
 
         return dto;
     }
+    public void addDepartementToSite(Long siteId, Long departementId) {
+        Site site = siteRepository.findById(siteId)
+                .orElseThrow(() -> new EntityNotFoundException("Site not found with id: " + siteId));
 
+        Departement departement = departementRepository.findById(departementId)
+                .orElseThrow(() -> new EntityNotFoundException("Departement not found with id: " + departementId));
+
+        site.addDepartement(departement);
+        siteRepository.save(site);
+    }
 }
 
 

@@ -6,19 +6,23 @@ import com.prjt.archive.Entity.ServiceEntity;
 import com.prjt.archive.Repo.DocumentRepository;
 import com.prjt.archive.Repo.UtilisateurRepo;
 import com.prjt.archive.Service.DocumentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000", methods = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.POST})
 @RequestMapping("api/doc")
 public class DocumentController {
+
+    private static final Logger logger = LoggerFactory.getLogger(DocumentController.class);
 
     @Autowired
     private DocumentService documentService;
@@ -26,6 +30,7 @@ public class DocumentController {
     private DocumentRepository documentRepository;
     @Autowired
     private UtilisateurRepo utilisateurRepo;
+
     @PostMapping(value = "/save/{id}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> saveDocument(
             @PathVariable Long id,
@@ -37,50 +42,36 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error saving document: " + e.getMessage());
         }
     }
+
     @GetMapping("/read")
     public List<DocumentDTO> read() {
         return documentService.getAllDocuments();
     }
+
     @GetMapping("/read/{id}")
     public ResponseEntity<Document> getDocumentById(@PathVariable("id") Long id) {
         Optional<Document> document = documentRepository.findById(id);
-
-        if (document.isPresent()) {
-            return ResponseEntity.ok(document.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return document.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
     @GetMapping("/societe-name/{siteId}")
     public ResponseEntity<?> getSocieteNameBySiteId(@PathVariable Long siteId) {
         try {
             String societeName = documentService.getSocieteNameBySiteId(siteId);
-            if (societeName != null) {
-                return ResponseEntity.ok(societeName);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Société not found for Site ID: " + siteId);
-            }
+            return societeName != null ? ResponseEntity.ok(societeName) : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Société not found for Site ID: " + siteId);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving société name: " + e.getMessage());
         }
     }
+
     @GetMapping("/test-service/{userId}")
     public ResponseEntity<?> testService(@PathVariable Long userId) {
         return utilisateurRepo.findById(userId)
                 .map(user -> {
                     ServiceEntity service = user.getService();
-                    if (service != null) {
-                        return ResponseEntity.ok(service.getNomService());
-                    } else {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Service not found");
-                    }
+                    return service != null ? ResponseEntity.ok(service.getNomService()) : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Service not found");
                 }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found"));
     }
-
-    /*@GetMapping("/read")
-    public List<Document> read() {
-        return documentService.lire();
-    }*/
 
     @DeleteMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
@@ -88,9 +79,22 @@ public class DocumentController {
     }
 
     @PutMapping("/update/{id}")
-    public Document update(@PathVariable Long id, @RequestBody Document document) {
-        return documentService.modifier(id, document);
+    public ResponseEntity<?> updateDocument(@PathVariable Long id, @RequestBody DocumentDTO documentDTO) {
+        try {
+            Document updatedDocument = documentService.updateDocument(id, documentDTO);
+            return ResponseEntity.ok(updatedDocument);
+        } catch (ResourceNotFoundException e) {
+            logger.error("Document not found: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
+        } catch (IOException e) {
+            logger.error("Error interacting with Google Drive: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interacting with Google Drive");
+        } catch (Exception e) {
+            logger.error("Unexpected error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error occurred");
+        }
     }
+
     @GetMapping("/by-type-and-email")
     public ResponseEntity<List<Document>> getDocumentsByTypeAndEmail(
             @RequestParam String type,
@@ -102,5 +106,4 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
-
 }

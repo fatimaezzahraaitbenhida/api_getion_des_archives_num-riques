@@ -2,6 +2,7 @@ package com.prjt.archive.Service.impl;
 
 import com.prjt.archive.Dto.DepDTO;
 import com.prjt.archive.Entity.Departement;
+import com.prjt.archive.Entity.Site;
 import com.prjt.archive.Repo.DepartementRepo;
 import com.prjt.archive.Service.DepService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,11 @@ public class DepIMPL implements DepService {
             throw new IllegalArgumentException("Le nom du département ne peut pas être nul.");
         }
         if (departementRepository.existsByNomDep(departement.getNomDep())) {
-            throw new IllegalArgumentException("Le nom du departement doit être unique.");
+            throw new IllegalArgumentException("Le nom du département doit être unique.");
         }
         return departementRepository.save(departement);
     }
+
     @Override
     public List<Departement> getAllDepartements() {
         return departementRepository.findAll();
@@ -59,8 +61,14 @@ public class DepIMPL implements DepService {
     @Override
     public void deleteDepartement(Long id) {
         Departement departement = getDepartementById(id);
+        // Remove the department from all associated sites
+        for (Site site : departement.getSites()) {
+            site.getDepartements().remove(departement);
+        }
         departementRepository.delete(departement);
     }
+
+
 
     @Override
     public List<Departement> getDepartementsBySiteId(Long siteId) {

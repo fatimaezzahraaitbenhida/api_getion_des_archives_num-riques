@@ -2,12 +2,15 @@ package com.prjt.archive.Controller;
 
 import com.prjt.archive.Dto.ServiceDTO;
 import com.prjt.archive.Dto.SiteDTO;
+import com.prjt.archive.Dto.UtilisateurDTO;
 import com.prjt.archive.Entity.Departement;
 import com.prjt.archive.Entity.Site;
 import com.prjt.archive.Entity.Societe;
 import com.prjt.archive.Repo.SiteRepo;
 import com.prjt.archive.Service.DepService;
 import com.prjt.archive.Service.SiteService;
+import com.prjt.archive.Service.UtilisateurService;
+import com.prjt.archive.Service.impl.UtilisateurIMPL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +29,8 @@ public class SiteController {
     private SiteService siteService;
     @Autowired
     private DepService depService;
+    @Autowired
+    private UtilisateurService utilisateurService;
 
     @Autowired
     private SiteRepo siteRepository;
@@ -113,4 +118,23 @@ public class SiteController {
     public ResponseEntity<Void> deleteSite(@PathVariable Long id) {
         siteService.deleteSite(id);
         return ResponseEntity.noContent().build();
-    }  }
+    }
+    @GetMapping("/{siteId}/utilisateurs")
+    public ResponseEntity<List<UtilisateurDTO>> getUtilisateursBySite(@PathVariable Long siteId) {
+        Site site = siteRepository.findById(siteId).orElse(null);
+        if (site == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        List<UtilisateurDTO> utilisateurs = site.getUsr().stream()
+                .map(utilisateurService::convertToDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(utilisateurs);
+    }
+    @PostMapping("/{siteId}/departements/{departementId}")
+    public ResponseEntity<String> addDepartementToSite(@PathVariable Long siteId, @PathVariable Long departementId) {
+        siteService.addDepartementToSite(siteId, departementId);
+        return ResponseEntity.ok("Departement added to Site successfully.");
+    }
+}

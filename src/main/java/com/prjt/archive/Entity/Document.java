@@ -1,6 +1,8 @@
 package com.prjt.archive.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -17,6 +19,7 @@ public class Document {
     private String nom;
 
     @Column(name = "date_creation")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date_creation;
 
     @Column(name = "type_doc", length = 255)
@@ -81,4 +84,21 @@ public class Document {
     public void setUser(Utilisateur user) {
         this.user = user;
     }
+    public static String extractFileIdFromUrl(String fileUrl) {
+        String[] parts = fileUrl.split("id=");
+        if (parts.length > 1) {
+            // L'ID est le premier élément après `id=`, et peut être suivi par d'autres paramètres
+            String idPart = parts[1];
+            // Séparation par le caractère `&` si d'autres paramètres sont présents
+            int endIndex = idPart.indexOf('&');
+            if (endIndex > -1) {
+                return idPart.substring(0, endIndex);
+            }
+            return idPart; // Cas où l'ID est le dernier paramètre
+        }
+        return null;
+    }
+
+
+
 }

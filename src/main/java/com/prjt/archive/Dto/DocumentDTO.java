@@ -1,11 +1,14 @@
 package com.prjt.archive.Dto;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 public class DocumentDTO {
     private Long idDoc;
     private String nom;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date dateCreation;
     private String typeDoc;
     private String chemin;

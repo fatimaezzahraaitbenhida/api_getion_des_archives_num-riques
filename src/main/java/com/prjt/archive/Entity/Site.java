@@ -23,7 +23,7 @@ public class Site {
     @JsonIgnore
     private Societe societe;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinTable(
             name = "site_departement",
             joinColumns = @JoinColumn(name = "site_id"),
@@ -106,4 +106,9 @@ public class Site {
     public void setUsr(Set<Utilisateur> usr) {
         this.usr = usr;
     }
+    public void addDepartement(Departement departement) {
+        this.departements.add(departement);
+        departement.getSites().add(this);
+    }
+
 }

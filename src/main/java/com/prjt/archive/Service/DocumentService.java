@@ -28,4 +28,6 @@ public interface DocumentService {
     List<DocumentDTO> getAllDocuments();
 
     String getSocieteNameBySiteId(Long siteId);
+
+    Document updateDocument(Long idDoc, DocumentDTO documentDTO)throws Exception;
 }

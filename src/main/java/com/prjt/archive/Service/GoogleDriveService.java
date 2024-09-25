@@ -19,7 +19,7 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 
 @org.springframework.stereotype.Service
-public class Service {
+public class GoogleDriveService {
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String SERVICE_ACCOUNT_KEY_PATH = getPathToGoogleCredentials();
@@ -28,45 +28,18 @@ public class Service {
         return Paths.get(System.getProperty("user.dir"), "cred.json").toString();
     }
 
+    private Drive drive;
+
+    public GoogleDriveService() throws GeneralSecurityException, IOException {
+        this.drive = createDriveService();
+    }
+
     public Res uploadFileToDrive(File file, String typeDoc) throws IOException, GeneralSecurityException {
         Res res = new Res();
         try {
             // Définissez les ID des dossiers selon le type de document
-            String folderId;
-            switch (typeDoc) {
-                case "Contrats":
-                    folderId = "1rl-EW0cqaaSy5oaiP59BbjjlRxb32n3W"; // ID du dossier Contrats
-                    break;
-                case "Factures":
-                    folderId = "1t3Q-yRAO8EmjiJE2CsykaLBHo1ifScyY"; // ID du dossier Factures
-                    break;
-                case "Reçus":
-                    folderId = "1EHaUrg_vIvCX_fbt49l5UIXNUb27boNR"; // ID du dossier Reçus
-                    break;
-                case "BilansComptables":
-                    folderId = "1YwIBb3DQeIp9dNaWd79ikX6Q0_F30Ahb"; // ID du dossier BilansComptables
-                    break;
-                case "DéclarationsFiscales":
-                    folderId = "180Bc9q2h3lLrVJMhMjk_WnlXOvehY_2h"; // ID du dossier DéclarationsFiscales
-                    break;
-                case "RelevésBancaires":
-                    folderId = "1q9l4ReOMCZdFWFiYkLVg70pa-hKsnIpl"; // ID du dossier RelevésBancaires
-                    break;
-                case "AccordsDeConfidentialité":
-                    folderId = "1hLAJG5AwbUFe5sMDMmQDfCThAYJDXQRg"; // ID du dossier AccordsDeConfidentialité
-                    break;
-                case "LitigesEtContentieux":
-                    folderId = "1cJbFaDgh440pyefbQiJ159hfuJllHDYO"; // ID du dossier LitigesEtContentieux
-                    break;
-                case "StatutsDeLaSociété":
-                    folderId = "1HFW8ZrY1cbsIrMlRJDVH-3HtYneUUJvN"; // ID du dossier StatutsDeLaSociété
-                    break;
-                default:
-                    folderId = "1fRL4lzmLIv0bJ0Zp616FgeQFnADpR8oW"; // ID du dossier ex1 par défaut
-                    break;
-            }
+            String folderId = getFolderIdForType(typeDoc);
 
-            Drive drive = createDriveService();
             com.google.api.services.drive.model.File fileMetaData = new com.google.api.services.drive.model.File();
             fileMetaData.setName(file.getName());
             fileMetaData.setParents(Collections.singletonList(folderId));
@@ -89,6 +62,31 @@ public class Service {
         return res;
     }
 
+    public String getFolderIdForType(String typeDoc) {
+        switch (typeDoc) {
+            case "Contrats":
+                return "1rl-EW0cqaaSy5oaiP59BbjjlRxb32n3W";
+            case "Factures":
+                return "1t3Q-yRAO8EmjiJE2CsykaLBHo1ifScyY";
+            case "Reçus":
+                return "1EHaUrg_vIvCX_fbt49l5UIXNUb27boNR";
+            case "BilansComptables":
+                return "1YwIBb3DQeIp9dNaWd79ikX6Q0_F30Ahb";
+            case "DéclarationsFiscales":
+                return "180Bc9q2h3lLrVJMhMjk_WnlXOvehY_2h";
+            case "RelevésBancaires":
+                return "1q9l4ReOMCZdFWFiYkLVg70pa-hKsnIpl";
+            case "AccordsDeConfidentialité":
+                return "1hLAJG5AwbUFe5sMDMmQDfCThAYJDXQRg";
+            case "LitigesEtContentieux":
+                return "1cJbFaDgh440pyefbQiJ159hfuJllHDYO";
+            case "StatutsDeLaSociété":
+                return "1HFW8ZrY1cbsIrMlRJDVH-3HtYneUUJvN";
+            default:
+                return "1jn3TJNj7JOSTT6AshPCjCSNH4ZTtOz78";
+        }
+    }
+
     private Drive createDriveService() throws IOException, GeneralSecurityException {
         GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(SERVICE_ACCOUNT_KEY_PATH))
                 .createScoped(Collections.singleton(DriveScopes.DRIVE));
@@ -105,4 +103,33 @@ public class Service {
                 }
         ).build();
     }
+
+    public String moveFile(String fileId, String typeDoc) throws IOException {
+        // Define the new folder ID based on document type
+        String newFolderId = getFolderIdForType(typeDoc);
+
+        // Retrieve the file from Google Drive
+        com.google.api.services.drive.model.File file = drive.files().get(fileId)
+                .setFields("parents")
+                .execute();
+
+        // Log the current and new folder IDs
+        String previousParents = String.join(",", file.getParents());
+        System.out.println("Previous Parents: " + previousParents);
+        System.out.println("New Folder ID: " + newFolderId);
+
+        // Remove the file from its previous parent folder
+        com.google.api.services.drive.model.File updatedFile = drive.files().update(fileId, null)
+                .setAddParents(newFolderId)
+                .setRemoveParents(previousParents)
+                .setFields("id, parents")
+                .execute();
+
+        // Log the updated file parents
+        System.out.println("Updated File Parents: " + String.join(",", updatedFile.getParents()));
+
+        return fileId; // Return the file ID to update the URL
+    }
+
+
 }

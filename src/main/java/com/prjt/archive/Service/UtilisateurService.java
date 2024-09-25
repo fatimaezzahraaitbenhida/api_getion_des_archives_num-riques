@@ -30,4 +30,6 @@ public interface UtilisateurService {
     List<Utilisateur> getUtilisateursByServiceId(Long id);
 
     UtilisateurDTO getUtilisateurByEmail(String email);
+
+    UtilisateurDTO convertToDTO(Utilisateur utilisateur);
 }

@@ -1,16 +1,23 @@
 package com.prjt.archive.Service.impl;
 
+import com.prjt.archive.Controller.DocumentNotFoundException;
+import com.prjt.archive.Controller.ResourceNotFoundException;
 import com.prjt.archive.Dto.DocumentDTO;
 import com.prjt.archive.Entity.Document;
 import com.prjt.archive.Entity.Utilisateur;
 import com.prjt.archive.Repo.DocumentRepository;
 import com.prjt.archive.Repo.UtilisateurRepo;
 import com.prjt.archive.Service.DocumentService;
+import com.prjt.archive.Service.GoogleDriveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.prjt.archive.Entity.Document.extractFileIdFromUrl;
 
 @Service
 public class DocumentIMPL implements DocumentService {
@@ -20,6 +27,8 @@ public class DocumentIMPL implements DocumentService {
 
     @Autowired
     private UtilisateurRepo utilisateurRepo;
+    @Autowired
+    private GoogleDriveService googleDriveService;
 
     @Override
     public List<Document> lire() {
@@ -109,10 +118,83 @@ public class DocumentIMPL implements DocumentService {
 
         return dto;
     }
+    @Override
+    public Document updateDocument(Long id, DocumentDTO documentDTO) throws IOException {
+        // Trouver le document existant
+        Document document = documentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Document non trouvé"));
+
+        // Mettre à jour les informations du document
+        document.setNom(documentDTO.getNom());
+        document.setDate_creation(documentDTO.getDateCreation());
+        document.setType_doc(documentDTO.getTypeDoc());
+
+        // Extraire l'ID du fichier depuis l'URL actuelle
+        String oldFileId = extractFileIdFromUrl(document.getChemin());
+        if (oldFileId == null) {
+            throw new IOException("ID de fichier invalide extrait de l'URL");
+        }
+        System.out.println("Old File ID: " + oldFileId);
+
+        // Déplacer le fichier sur Google Drive et obtenir le nouvel ID de fichier
+        String newFolderId = googleDriveService.getFolderIdForType(documentDTO.getTypeDoc());
+        if (newFolderId == null) {
+            throw new IOException("ID de dossier invalide pour le type de document");
+        }
+        System.out.println("New Folder ID: " + newFolderId);
+
+        // Appeler la méthode moveFile pour déplacer le fichier
+        String newFileId = googleDriveService.moveFile(oldFileId, documentDTO.getTypeDoc());
+        if (newFileId == null) {
+            throw new IOException("Échec du déplacement du fichier sur Google Drive");
+        }
+        System.out.println("New File ID: " + newFileId);
+
+        // Mettre à jour le chemin du fichier avec le nouvel ID
+        String newFileUrl = "https://drive.google.com/uc?export=view&id=" + newFileId;
+        document.setChemin(newFileUrl);
+
+        // Enregistrer le document mis à jour
+        return documentRepository.save(document);
+    }
 
 
 
 
 
 
+
+
+
+
+
+    private String getFolderIdByType(String typeDoc) {
+        switch (typeDoc) {
+            case "Contrats":
+                return "1rl-EW0cqaaSy5oaiP59BbjjlRxb32n3W";
+            case "Factures":
+                return "1t3Q-yRAO8EmjiJE2CsykaLBHo1ifScyY";
+            case "Reçus":
+                return "1EHaUrg_vIvCX_fbt49l5UIXNUb27boNR";
+            case "BilansComptables":
+                return "1YwIBb3DQeIp9dNaWd79ikX6Q0_F30Ahb";
+            case "DéclarationsFiscales":
+                return "180Bc9q2h3lLrVJMhMjk_WnlXOvehY_2h";
+            case "RelevésBancaires":
+                return "1q9l4ReOMCZdFWFiYkLVg70pa-hKsnIpl";
+            case "AccordsDeConfidentialité":
+                return "1hLAJG5AwbUFe5sMDMmQDfCThAYJDXQRg";
+            case "LitigesEtContentieux":
+                return "1cJbFaDgh440pyefbQiJ159hfuJllHDYO";
+            case "StatutsDeLaSociété":
+                return "1HFW8ZrY1cbsIrMlRJDVH-3HtYneUUJvN";
+            default:
+                return "1jn3TJNj7JOSTT6AshPCjCSNH4ZTtOz78";
+        }
+    }
 }
+
+
+
+
+
